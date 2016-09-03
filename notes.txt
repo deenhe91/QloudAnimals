@@ -1,0 +1,3 @@
+After drawing out the order of events, I began to code up each stage and test it on a single image as I went along. 
+
+Setting environment variable.
