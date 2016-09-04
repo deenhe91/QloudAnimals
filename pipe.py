@@ -10,18 +10,23 @@ import os #google api (making environmental variable)
 from collections import defaultdict # initially storing labels and urls
  # transfer of info to firebase storage
 from firebase.firebase import FirebaseApplication, FirebaseAuthentication
+from firebase import firebase
+
+import json
 
 # using the flickr API
 
 flickr_key = '11edab83a734a506db6af791bf0c86f9'
 flickr_secret = 'ff2f0298eaf4853a'
 
-r = requests.get('https://api.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=7fce6d4e6e724c4f1d32d3e3a4a64ae1&group_id=61595479%40N00&per_page=500&format=json&nojsoncallback=1')
+r = requests.get('https://api.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=6d3c21bdbff3887ae3eb063c75fd0195&group_id=61595479%40N00&per_page=500&format=json&nojsoncallback=1')
 flickr_list = r.json()
 
 img_info = flickr_list['photos']['photo']
 print('\nnumber of photos: ', len(img_info))
 
+with open('flickr_response', 'w') as outfile:
+	json.dump(img_info, outfile) # for these purposes save so can tackle stage by stage
 
 # FUNCTIONS: 
 # 1. compile URLs, download image at url.
@@ -39,47 +44,65 @@ def get_URL(img):
 	return url
 
 
+urls = [] # create list of urls. 
+
+for img in img_info:
+	url = get_URL(img)
+	urls.append(url)
+
+
+b64_strings = [] # create list of b64_strings
+
+for url in urls:
+	response = requests.get(url, stream=True)
+	
+	with open('img.png', 'wb') as f:
+		shutil.copyfileobj(response.raw, f)
+	with open('img.png', 'rb') as f:
+		encoded_string = base64.b64encode(f.read())
+		b64_strings.append(encoded_string)
+
+del response
+
+
 # 2. encode downloaded image and send to google vision API for labeling.
 # Save labels.
-
-def Googlify(img_file):
-	with open(img_file, "rb") as image_file:
-		encoded_string = base64.b64encode(image_file.read())
-
-	service = discovery.build('vision', 'v1', credentials=credentials, discoveryServiceUrl=DISCOVERY_URL)
-
-	service_request = service.images().annotate(body={
-		'requests': [{
-			'image': {
-			'content': encoded_string.decode('UTF-8')
-		},
-		'features': [{
-			'type': 'LABEL_DETECTION',
-			'maxResults': 5
-		}]
-	}]
-	})
-
-	response = service_request.execute()
-	labels = response['responses'][0]['labelAnnotations']
-	return labels
-
 
 DISCOVERY_URL = 'https://vision.googleapis.com/$discovery/rest?version=v1'
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'q-dev-challenge-hannah-47b6d0e98d36.json'
 credentials = GoogleCredentials.get_application_default()	
 
+service = discovery.build('vision', 'v1', credentials=credentials, discoveryServiceUrl=DISCOVERY_URL)
+
+googlers = [] #create list of google responses
+
+for string in b64_strings:
+	service_request = service.images().annotate(body={'requests': [{'image': {'content': string.decode('UTF-8')},'features': [{'type': 'LABEL_DETECTION','maxResults': 5}]}]})
+	response = service_request.execute()
+	labels = response['responses'][0]['labelAnnotations']
+	googlers.append(labels)
+
+
+
+
+# firebase firebase firebase
 
 if __name__ == '__main__':
-    SECRET = '12345678901234567890'
-    DSN = 'https://firebase.localhost'
+    SECRET = 'D9TpBzyLhSv6yJX59YeBcijiNAYWTkSMlvmAPBAK'
+    DSN = 'https://firebase.q-dev-challenge-hannah.firebaseapp.com'
     EMAIL = 'hannah.deen91@email.com'
     authentication = FirebaseAuthentication(SECRET,EMAIL, True, True)
     firebase = FirebaseApplication(DSN, authentication)
 
 
-firebase = firebase.FirebaseApplication('https://q-dev-challenge-hannah.firebaseio.com', None)
+# firebase = firebase.FirebaseApplication('https://q-dev-challenge-hannah.firebaseio.com', None)
 firebase.get('/labels', None, params={'print': 'pretty'})
+
+
+with open('flickr_response') as f:
+	img_info = json.load(f)
+
+
 
 i = 0
 for img in img_info[1:10]:
@@ -90,7 +113,10 @@ for img in img_info[1:10]:
 		data = {'label': label['description'], 'score': label['score'], 'image_url': url}
 		snapshot = firebase.post('/labels', data)
 		# print(snapshot['label'])
-
+	def callback_get(response):
+        with open('/dev/null', 'w') as f:
+            f.write(response)
+    firebase.get_async('/labels', snapshot['name'], callback=callback_get)
 	
 	i = i+1
 	print('Image ', i)
