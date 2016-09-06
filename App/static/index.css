@@ -1,15 +1,15 @@
 
 body {
 
-	background-color: #B1ADBC;
+  background-color: #B1ADBC;
 
 }
 
 
 h1 {
 
-	color:#405D6D;
-	font-size: 100px;
+  color:#405D6D;
+  font-size: 100px;
     font-family: "Libre Franklin";
     margin-left: 50px;
 
@@ -26,7 +26,7 @@ p {
 } 
 
 
-div {
+div.ui-widget {
 
   color: #352758 ;
   font-family: "Libre Franklin";
@@ -38,11 +38,10 @@ div {
 
 img {
 
-	margin-top: 5px;
-	margin-bottom: 5px;
-	height:320px;
-	width:480px;
-	padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height:320px;
+  width:480px;
+  padding: 10px;
 
 }
-
