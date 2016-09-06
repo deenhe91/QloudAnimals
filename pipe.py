@@ -14,67 +14,79 @@ from collections import defaultdict # initially storing labels and urls
 
 import json
 import pickle
+import sys
 
 # using the flickr API
 
-# flickr_key = '11edab83a734a506db6af791bf0c86f9'
-# flickr_secret = 'ff2f0298eaf4853a'
+flickr_key = '11edab83a734a506db6af791bf0c86f9'
+flickr_secret = 'ff2f0298eaf4853a'
 
-# r = requests.get('https://api.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=2591413f0cceaf433dff5018e4ef3228&group_id=61595479%40N00&per_page=500&page=2&format=json&nojsoncallback=1')
-# flickr_list2 = r.json()
+flickr_file = []
 
-# img_info2 = flickr_list2['photos']['photo']
-# print('\nnumber of photos: ', len(img_info2))
+flickr_file = []
 
-# with open('flickr_response2', 'w') as outfile:
-# 	json.dump(img_info2, outfile) # for these purposes save so can tackle stage by stage
+group_id = input("enter group id : ")
+pages = input("enter number of pages (default set to 500 results per page) :\n\n ")
+
+def get_flickrd(group_id, pages):
+	for i in range(int(pages)):
+		r = requests.get('https://api.flickr.com/services/rest/?method=flickr.groups.pools.getPhotos&api_key=2591413f0cceaf433dff5018e4ef3228&group_id='+str(group_id)+'&per_page=500&page='+str(i)+'&format=json&nojsoncallback=1')
+		flickr_json = r.json()
+		flickr_file.append(flickr_json)
+
+	img_info = []
+	for page in flickr_file:
+		img_info.append(page['photos']['photo'])
+	return img_info
+
+img_info = get_flickrd(group_id, pages)
+
+print('\nnumber of pages: ', len(img_info), ' , number of images per page: ', len(img_info[0]))
+
+with open('flickr.json', 'w') as outfile:
+	json.dump(flickr_file, outfile) # for these purposes save so can tackle stage by stage
 
 
-with open('flickr_response2') as file:
-    img_info2 = json.load(file)
+'''with open('flickr.json') as file:
+    img_info = json.load(file)'''
 
 # FUNCTIONS: 
 # 1. compile URLs, download image at url.
 
 """format: https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg"""
 
-# def get_URL(img):
-# 	url = 'https://c1.staticflickr.com/'+str(img['farm'])+'/'+str(img['server'])+'/'+str(img['id'])+'_'+str(img['secret'])+'_b.jpg'
-# 	response = requests.get(url, stream=True)
-	
-# 	with open('img.png', 'wb') as out_file:
-# 		shutil.copyfileobj(response.raw, out_file)
-
-# 	del response
-# 	return url
-
-
-urls2 = [] # create list of urls. 
+urls = [] # create list of urls. 
 
 print('\ncompiling urls...\n')
 
-for img in img_info2:
-	url = url = 'https://c1.staticflickr.com/'+str(img['farm'])+'/'+str(img['server'])+'/'+str(img['id'])+'_'+str(img['secret'])+'_b.jpg'
-	urls2.append(url)
+for img in img_info:
+	url = 'https://c1.staticflickr.com/'+str(img['farm'])+'/'+str(img['server'])+'/'+str(img['id'])+'_'+str(img['secret'])+'_b.jpg'
+	urls.append(url)
 
-print('urls compiled and stored at urls2\n')
+with open('urls', 'wb') as f:
+	pickle.dump(urls, f)
 
-b64_strings2 = [] # create list of b64_strings
+print('urls compiled and stored at urls\n')
+
+b64_strings = [] # create list of b64_strings
 
 print('\n downloading and b64 encoding images...\n')
 
 i = 0
 
-for url in urls2:
+for url in urls:
 	i += 1
+
 	response = requests.get(url, stream=True)
 	
 	with open('img.png', 'wb') as f:
 		shutil.copyfileobj(response.raw, f)
+
 	with open('img.png', 'rb') as f:
 		encoded_string = base64.b64encode(f.read())
-		b64_strings2.append(encoded_string)
-	print(i)
+		b64_strings.append(encoded_string)
+
+	print('encoding image : '+str(i))
 
 del response
 
@@ -91,60 +103,38 @@ credentials = GoogleCredentials.get_application_default()
 
 service = discovery.build('vision', 'v1', credentials=credentials, discoveryServiceUrl=DISCOVERY_URL)
 
-# googlers2 = [] #create list of google responses
+googlers = [] #create list of google responses
 
 i = 0
 
-for string in b64_strings2:
+for string in b64_strings:
 	i += 1
+
 	service_request = service.images().annotate(body={'requests': [{'image': {'content': string.decode('UTF-8')},'features': [{'type': 'LABEL_DETECTION','maxResults': 5}]}]})
-	response = service_request.execute()
-	labels = response['responses'][0]['labelAnnotations']
-	print('string :'+ str(i))
-	googlers2.append(labels)
-
-# print('googling done... saving results\n\n')
-
-# with open('google_results2.json', 'wb') as f:
-# 	pickle.dump(googlers2, f)
-
-# with open('urls2', 'wb') as f:
-# 	pickle.dump(urls2, f)
-
-# googlers : 498 label sets
-# short_urls : urls relevant to googler results
-
-
-
-# with open('flickr_response2') as f:
-# 	img_info = json.load(f)
-
-
-
-# i = 0
-# for img in img_info[1:10]:
-# 	url = get_URL(img)
-# 	labels = Googlify('img.png')
-
-# 	for label in labels:
-# 		data = {'label': label['description'], 'score': label['score'], 'image_url': url}
-# 		snapshot = firebase.post('/labels', data)
-# 		# print(snapshot['label'])
-# 	def callback_get(response):
-#         with open('/dev/null', 'w') as f:
-#             f.write(response)
-#     firebase.get_async('/labels', snapshot['name'], callback=callback_get)
 	
-# 	i = i+1
-# 	print('Image ', i)
-# 	os.remove('img.png')
+	response = service_request.execute()
+	
+	if 'labelAnnotations' in response['responses'][0]:
+		labels = response['responses'][0]['labelAnnotations']
+		googlers.append(labels)
+		print('string :'+ str(i))
+	else:
+		print('SKIPPED string : ' +str(i))
+	
+
+print('googling done... saving results\n\n')
+
+with open('google_results.json', 'wb') as f:
+	pickle.dump(googlers, f)
+
+
 
 
 fb_dictionary = {}
 
-for i in range(len(googlers2)):
+for i in range(len(googlers)):
 	for label in googlers[i]:
-		url_and_score = (label['score'], sh_urls2[i])
+		url_and_score = (label['score'], new_urls[i])
 		
 		if label['description'] in fb_dictionary:
 			fb_dictionary[label['description']].append(url_and_score)
