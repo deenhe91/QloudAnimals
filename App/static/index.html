@@ -1,0 +1,47 @@
+<html>
+  <head>
+
+    <title>{{ title }} - Animals in the Qloud</title>
+    <link href='https://fonts.googleapis.com/css?family=Libre+Franklin:200,100' rel='stylesheet' type='text/css' />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+      <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDhTIcxxH_fOdjty6XRZ8XRyiQyvMUO7wM",
+      authDomain: "q-dev-challenge-hannah.firebaseapp.com",
+      databaseURL: "https://q-dev-challenge-hannah.firebaseio.com",
+      storageBucket: "q-dev-challenge-hannah.appspot.com",
+    };
+    
+    firebase.initializeApp(config);
+
+  </script>
+    <script src="index.js"></script>
+
+    <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css' />
+
+  </head>
+  <body>
+  <div class="center">
+  <h1>ANIMALS IN THE QLOUD</h1>
+  <p>Look up an animal by Google Vision's interpretation</p>
+  <div class="ui-widget">
+      <label for="tags">ANIMAL </label>
+      <input id="tags">
+  </div>
+</div>
+
+<div class="image"></div>
+
+  </body>
+
+
+
+</html>
+

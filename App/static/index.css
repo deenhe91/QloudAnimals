@@ -1,0 +1,48 @@
+
+body {
+
+	background-color: #B1ADBC;
+
+}
+
+
+h1 {
+
+	color:#405D6D;
+	font-size: 100px;
+    font-family: "Libre Franklin";
+    margin-left: 50px;
+
+}
+
+
+p {
+  
+  color: #293D4C;
+  font-family: "Libre Franklin";
+  font-size: 40px;
+  margin-left: 10px;
+
+} 
+
+
+div {
+
+  color: #352758 ;
+  font-family: "Libre Franklin";
+  margin-left: 20px;
+  height:70px;
+  width: 350px;
+
+} 
+
+img {
+
+	margin-top: 5px;
+	margin-bottom: 5px;
+	height:320px;
+	width:480px;
+	padding: 10px;
+
+}
+
