@@ -7,34 +7,65 @@ body {
 
 
 h1 {
-
-  color:#405D6D;
+  display:flex;
+  align-items: center;
+  color:#352758;
   font-size: 100px;
-    font-family: "Libre Franklin";
-    margin-left: 50px;
+  font-family: "Libre Franklin";
+    
 
 }
 
 
 p {
-  
+  display:flex;
+  align-items: center;
   color: #293D4C;
   font-family: "Libre Franklin";
   font-size: 40px;
-  margin-left: 10px;
+
 
 } 
 
 
 div.ui-widget {
 
+  display:flex;
+  align-items: ;
   color: #352758 ;
   font-family: "Libre Franklin";
-  margin-left: 20px;
+  font-size: 25px;
   height:70px;
-  width: 350px;
+/*  width: 450px;*/
 
 } 
+
+div.ui-widget label {
+  width: 200px;
+}
+
+div.ui-widget input#tags {
+  font-family: 'Libre Franklin';
+  color: grey;
+  height: 40px;
+/*  width: 350px;*/
+  padding: 10px;
+  margin-left: 15px
+}
+
+div.image {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+ul {
+  font-family: "Libre Franklin";
+  color:lightgrey;
+
+}
 
 img {
 
