@@ -11,7 +11,7 @@ with open('urls', 'rb') as f:
 
 
 
-f = Firebase('https://firebase.q-dev-challenge-hannah.firebaseapp.com', auth_token='D9TpBzyLhSv6yJX59YeBcijiNAYWTkSMlvmAPBAK')
+f = Firebase('https://firebase.q-dev-challenge-hannah.firebaseapp.com', auth_token='xxx')
 
 
 for g in range(len(googlers)):
