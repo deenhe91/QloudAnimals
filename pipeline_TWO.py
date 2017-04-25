@@ -9,8 +9,8 @@ import os #google api (making environmental variable)
 
 import pickle
 
-flickr_key = '11edab83a734a506db6af791bf0c86f9'
-flickr_secret = 'ff2f0298eaf4853a'
+flickr_key = 
+flickr_secret = 
 
 flickr_file = []
 
